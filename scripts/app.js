@@ -18,7 +18,7 @@ var screenParams = {
 	sensorOffsetZ: -0.05 //mts
 };
 
-	screenParams.aspectRatio = screen.width / screen.height;
+screenParams.aspectRatio = screen.width / screen.height;
 screenParams.diagAngle = Math.atan(1/screenParams.aspectRatio);
 screenParams.height = Math.sin(screenParams.diagAngle) * screenParams.diag; //mts
 screenParams.width = Math.cos(screenParams.diagAngle) * screenParams.diag; //mts
@@ -46,8 +46,9 @@ function storageScene(cb) {
 	        // Model
 	        scene.add(room);
 
-	        chair.scale.x = chair.scale.y = chair.scale.z = 0.1;
-	        chair.position.set(0, 0, 60);
+	        chair.scale.x = chair.scale.y = chair.scale.z = 0.035;
+	        chair.rotation.y = Math.PI/2;
+	        chair.position.set(0, 0, 5);
 	        scene.add(chair);
 	        
 			cb();
@@ -206,10 +207,10 @@ function doMove(x, y, z) {
 
 	var x0 = 0, x1 = 0, y0 = 0, y1 = 0;
 	var dots = [];
-	projectionMatrix = new THREE.Matrix4().multiplyMatrices( camera.projectionMatrix, new THREE.Matrix4().getInverse(projectionMatrix) );
+	projectionMatrix = new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, new THREE.Matrix4().getInverse(projectionMatrix));
 
 	for (var i = 0; i < 4; i++) {
-		var dot = vector.clone().setFromMatrixPosition( frame.children[i].matrixWorld ).applyProjection( projectionMatrix );
+		var dot = vector.clone().setFromMatrixPosition(frame.children[i].matrixWorld).applyProjection(projectionMatrix);
 		dots.push(dot);
 		x0 = Math.min(x0, dot.x);
 		y0 = Math.min(y0, dot.y);
