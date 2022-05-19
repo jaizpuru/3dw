@@ -1,5 +1,5 @@
     var scene, camera, renderer, light;
-    var park, chair, ground, frame;
+    var room, chair, ground, frame;
 
     // Full HD monitor
     /*
@@ -25,9 +25,9 @@
 
 	function load(callback) {
 		var loader = new THREE.OBJMTLLoader();
-		//loader.load( 'models/Petco Park.obj', 'models/Petco Park.mtl', function(_park) {
+		//loader.load( 'models/Storage.obj', 'models/Storage.mtl', function(_room) {
 			//loader.load('models/Chair.obj', 'models/Chair.mtl', function(_chair) {
-				//park = _park;
+				//room = _room;
 				//chair = _chair;
 				callback();
 			//});
@@ -98,9 +98,7 @@
         scene.add(frame);
 
         // Model
-		//park.scale.x = park.scale.y = park.scale.z = 0.1;
-		//park.position.set(0, -60, 1220);
-        //scene.add(park);
+        //scene.add(room);
 
         //chair.scale.x = chair.scale.y = chair.scale.z = 0.1;
         //chair.position.set(0, 0, 60);
@@ -113,6 +111,7 @@
 		// LIGHTS
 		var dirLight = new THREE.PointLight( 0xff0000, 1, 500 );
 		dirLight.position.set( 0, 250, 0 );
+		dirLight.target = new THREE.Vector3(0,0,0);
 		scene.add(dirLight);
 		scene.add(new THREE.AmbientLight( 0x666666));
 
@@ -175,7 +174,7 @@
 
     	var zScale = Math.atan(screenParams.height * env.availableHeight / 2 / distanceVector.length()) * 2;
     	camera.fov = zScale / Math.PI * 180;
-		//camera.updateProjectionMatrix();
+		camera.updateProjectionMatrix();
 
 		// Correct camera target based on viewing angle - Real deal
 		var y0 = frame.position.y + frame.scale.y * screenParams.height/2;
@@ -229,7 +228,7 @@
         requestAnimationFrame(render);
 
 		//controls.update();
-		//light.position = camera.position;
+		light.position = camera.position;
 		//composer.render(0.1);
         renderer.render( scene, camera );
     }
