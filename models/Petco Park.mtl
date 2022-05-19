@@ -1,0 +1,223 @@
+#
+## Alias OBJ Material File
+# Exported from SketchUp, (c) 2000-2012 Trimble Navigation Limited
+
+newmtl palm_tree
+Ka 0.000000 0.000000 0.000000
+Kd 0.054902 0.054902 0.047059
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/palm_tree.png
+
+newmtl tree9
+Ka 0.000000 0.000000 0.000000
+Kd 0.121569 0.141176 0.086275
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/tree9.png
+
+newmtl queenpalm3
+Ka 0.000000 0.000000 0.000000
+Kd 0.082353 0.086275 0.078431
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/queenpalm3.png
+
+newmtl tree3
+Ka 0.000000 0.000000 0.000000
+Kd 0.145098 0.172549 0.082353
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/tree3.png
+
+newmtl FrontColor
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 1.000000 1.000000
+Ks 0.330000 0.330000 0.330000
+
+newmtl rightfieldfence
+Ka 0.000000 0.000000 0.000000
+Kd 0.254902 0.239216 0.239216
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/rightfieldfence.jpg
+
+newmtl walkcontex
+Ka 0.000000 0.000000 0.000000
+Kd 0.623529 0.623529 0.631373
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/walkcontex.jpg
+
+newmtl seatstex
+Ka 0.000000 0.000000 0.000000
+Kd 0.247059 0.317647 0.423529
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/seatstex.jpg
+
+newmtl stontex1
+Ka 0.000000 0.000000 0.000000
+Kd 0.654902 0.545098 0.411765
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/stontex1.jpg
+
+newmtl leftfence
+Ka 0.000000 0.000000 0.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/leftfence.png
+
+newmtl leftfieldfence
+Ka 0.000000 0.000000 0.000000
+Kd 0.388235 0.309804 0.341176
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/leftfieldfence.jpg
+
+newmtl wmscstrip
+Ka 0.000000 0.000000 0.000000
+Kd 0.529412 0.521569 0.525490
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/wmscstrip.jpg
+
+newmtl snapshot
+Ka 0.000000 0.000000 0.000000
+Kd 0.345098 0.360784 0.329412
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/snapshot.jpg
+
+newmtl stontex2
+Ka 0.000000 0.000000 0.000000
+Kd 0.862745 0.729412 0.568627
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/stontex2.jpg
+
+newmtl battereyetex
+Ka 0.000000 0.000000 0.000000
+Kd 0.000000 0.294118 0.494118
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/battereyetex.jpg
+
+newmtl fence_tex2
+Ka 0.000000 0.000000 0.000000
+Kd 0.129412 0.141176 0.160784
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/fence_tex2.jpg
+
+newmtl roofsupporttex
+Ka 0.000000 0.000000 0.000000
+Kd 0.196078 0.207843 0.215686
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/roofsupporttex.png
+
+newmtl bricktex1
+Ka 0.000000 0.000000 0.000000
+Kd 0.619608 0.447059 0.392157
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/bricktex1.jpg
+
+newmtl wmscbacktex
+Ka 0.000000 0.000000 0.000000
+Kd 0.650980 0.541176 0.525490
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/wmscbacktex.jpg
+
+newmtl support_tex_1
+Ka 0.000000 0.000000 0.000000
+Kd 0.168627 0.172549 0.168627
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/support_tex_1.png
+
+newmtl Color_E12
+Ka 0.000000 0.000000 0.000000
+Kd 0.600000 0.600000 0.117647
+Ks 0.330000 0.330000 0.330000
+
+newmtl wmscstrip2
+Ka 0.000000 0.000000 0.000000
+Kd 0.450980 0.415686 0.411765
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/wmscstrip2.jpg
+
+newmtl Color_006
+Ka 0.000000 0.000000 0.000000
+Kd 0.337255 0.337255 0.337255
+Ks 0.330000 0.330000 0.330000
+
+newmtl petcoword
+Ka 0.000000 0.000000 0.000000
+Kd 0.423529 0.360784 0.368627
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/petcoword.png
+
+newmtl wmscbackbottex
+Ka 0.000000 0.000000 0.000000
+Kd 0.364706 0.266667 0.235294
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/wmscbackbottex.jpg
+
+newmtl fencetex
+Ka 0.000000 0.000000 0.000000
+Kd 0.254902 0.254902 0.243137
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/fencetex.png
+
+newmtl left_scoreboard
+Ka 0.000000 0.000000 0.000000
+Kd 0.670588 0.658824 0.658824
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/left_scoreboard.jpg
+
+newmtl supporttex1
+Ka 0.000000 0.000000 0.000000
+Kd 0.341176 0.356863 0.368627
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/supporttex1.png
+
+newmtl backsupport2
+Ka 0.000000 0.000000 0.000000
+Kd 0.435294 0.458824 0.478431
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/backsupport2.png
+
+newmtl supporttex1_1_
+Ka 0.000000 0.000000 0.000000
+Kd 0.341176 0.356863 0.368627
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/supporttex1_1_.png
+
+newmtl supporttex1_2_
+Ka 0.000000 0.000000 0.000000
+Kd 0.341176 0.356863 0.368627
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/supporttex1_2_.png
+
+newmtl underside_seats
+Ka 0.000000 0.000000 0.000000
+Kd 0.447059 0.443137 0.415686
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/underside_seats.jpg
+
+newmtl windowstex
+Ka 0.000000 0.000000 0.000000
+Kd 0.294118 0.290196 0.337255
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/windowstex.jpg
+
+newmtl supporttex1_3_
+Ka 0.000000 0.000000 0.000000
+Kd 0.341176 0.356863 0.368627
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/supporttex1_3_.png
+
+newmtl supporttex1_4_
+Ka 0.000000 0.000000 0.000000
+Kd 0.341176 0.356863 0.368627
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/supporttex1_4_.png
+
+newmtl lightstex
+Ka 0.000000 0.000000 0.000000
+Kd 0.537255 0.549020 0.572549
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/lightstex.png
+
+newmtl backleftex
+Ka 0.000000 0.000000 0.000000
+Kd 0.392157 0.400000 0.396078
+Ks 0.330000 0.330000 0.330000
+map_Kd Petco Park/backleftex.jpg
+
