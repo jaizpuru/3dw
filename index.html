@@ -13,6 +13,11 @@
 
 	<script src="scripts/jquery-2.1.0.min.js"></script>
 	<script src="scripts/three-67.min.js"></script>
+	<script src="scripts/EffectComposer.js"></script>
+	<script src="scripts/RenderPass.js"></script>
+	<script src="scripts/ShaderPass.js"></script>
+	<script src="scripts/MaskPass.js"></script>
+
 	<script src="scripts/OBJMTLLoader.js"></script>
 	<script src="scripts/MTLLoader.js"></script>
 
@@ -20,6 +25,58 @@
 
 	<script src="scripts/app.js"></script>
 	<script src="scripts/alchemy-client.js"></script>
+
+	<script>
+		THREE.MirrorShader = {
+
+			uniforms: {
+
+				"tDiffuse": { type: "t", value: null },
+				"side":     { type: "i", value: 2 }
+
+			},
+
+			vertexShader: [
+
+				"varying vec2 vUv;",
+
+				"void main() {",
+
+					"vUv = uv;",
+					"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+				"}"
+
+			].join("\n"),
+
+			fragmentShader: [
+
+				"uniform sampler2D tDiffuse;",
+				"uniform int side;",
+				
+				"varying vec2 vUv;",
+
+				"void main() {",
+
+					"vec2 p = vUv;",
+					"if (side == 0){",
+						"if (p.x > 0.5) p.x = 1.0 - p.x;",
+					"}else if (side == 1){",
+						"if (p.x < 0.5) p.x = 1.0 - p.x;",
+					"}else if (side == 2){",
+						"if (p.y < 0.5) p.y = 1.0 - p.y;",
+					"}else if (side == 3){",
+						"if (p.y > 0.5) p.y = 1.0 - p.y;",
+					"} ",
+					"vec4 color = texture2D(tDiffuse, p);",
+					"gl_FragColor = color;",
+
+				"}"
+
+			].join("\n")
+
+		};
+	</script>
 	
 </body>
 </html>

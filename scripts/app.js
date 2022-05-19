@@ -25,13 +25,13 @@
 
 	function load(callback) {
 		var loader = new THREE.OBJMTLLoader();
-		loader.load( 'models/Petco Park.obj', 'models/Petco Park.mtl', function(_park) {
-			loader.load('models/Chair.obj', 'models/Chair.mtl', function(_chair) {
-				park = _park;
-				chair = _chair;
+		//loader.load( 'models/Petco Park.obj', 'models/Petco Park.mtl', function(_park) {
+			//loader.load('models/Chair.obj', 'models/Chair.mtl', function(_chair) {
+				//park = _park;
+				//chair = _chair;
 				callback();
-			});
-		});
+			//});
+		//});
 	}
 
 	function connectToKinect() {
@@ -92,18 +92,18 @@
 	        frameVertex.position.set(x, y, 0);
 	        frame.add(frameVertex);
         }
+        frame.add(new THREE.Mesh(geo, mat));
         frame.position.set(0, screenParams.altitude + screenParams.height / 2, 0);
         scene.add(frame);
 
         // Model
-		park.scale.x = park.scale.y = park.scale.z = 0.1;
-		park.position.set(0, -60, 1220);
-
+		//park.scale.x = park.scale.y = park.scale.z = 0.1;
+		//park.position.set(0, -60, 1220);
         //scene.add(park);
 
-        chair.scale.x = chair.scale.y = chair.scale.z = 0.1;
-        chair.position.set(0, 0, 60);
-        scene.add(chair);
+        //chair.scale.x = chair.scale.y = chair.scale.z = 0.1;
+        //chair.position.set(0, 0, 60);
+        //scene.add(chair);
         
         camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 2000 );
         camera.position.set(0, screenParams.altitude + screenParams.height/2, -2);
@@ -116,7 +116,7 @@
 		scene.add(new THREE.AmbientLight( 0x666666));
 
 	    light = new THREE.DirectionalLight(0xffffff, 1);
-		light.target = park;
+		//light.target = park;
 		light.shadowCameraNear = 100;
 	    light.shadowCameraFar = 1200;
         scene.add(light);
@@ -125,8 +125,24 @@
 		ground.rotation.x = -Math.PI/2;
 		scene.add(ground);
 
+		wall = new THREE.Mesh(new THREE.PlaneGeometry(5000, 5000), new THREE.MeshLambertMaterial({color: 0x00aa22}));
+		wall.rotation.y = Math.PI;
+		wall.position.z = 200;
+		scene.add(wall);
+
         renderer = new THREE.WebGLRenderer({antialias: true});
+        composer = new THREE.EffectComposer( renderer);
         document.body.appendChild(renderer.domElement);
+
+		//POST PROCESSING
+		//Create Shader Passes
+		renderPass = new THREE.RenderPass( scene, camera );
+
+		composer = new THREE.EffectComposer( renderer);
+		composer.addPass(renderPass);
+		var mirror = new THREE.ShaderPass(THREE.MirrorShader);
+		composer.addPass(mirror);
+		mirror.renderToScreen = true;
 
         onWindowResize();
         window.addEventListener('resize', onWindowResize, false );
@@ -138,8 +154,8 @@
     }
 
     function moveMouse(e) {
-    	var x = 0;//(0.5 - e.pageX / window.innerWidth) * screenParams.width * 4;
-    	var y = frame.position.y + (0.5 - e.pageY / window.innerHeight) * screenParams.height * 12;
+    	var x = (0.5 - e.pageX / window.innerWidth) * screenParams.width * 3;
+    	var y = frame.position.y + (0.5 - e.pageY / window.innerHeight) * screenParams.height * 3;
     	var z = 0.5;//0.1 + (e.pageY / window.innerHeight) * 1.8;/*0.2mts - 2mts*/;
     	doMove(x, y, z);
     }
@@ -162,18 +178,18 @@
 			y: Math.atan(distanceVector.y / z)
 		};
 
-		camera.scale.x = Math.cos(viewingAngle.x) * 5;
-		camera.scale.y = Math.cos(viewingAngle.y) * 5;
+		camera.scale.x = Math.cos(viewingAngle.x) * 3;
+		camera.scale.y = Math.cos(viewingAngle.y) * 3;
 
 		var target = frame.position.clone();
 		
 		// Correct camera target based on viewing angle - Fast approximation ~ 60% efficiency
-		var centerY = Math.sin(viewingAngle.y) * 0.5;
-		target.yo = target.y + centerY * screenParams.height * env.availableHeight / 4; //Aproximation
-		var centerX = Math.sin(viewingAngle.x) * 0.5;
-		target.yo = centerX * screenParams.width * env.availableWidth / 4; //Aproximation
+		//var centerY = Math.sin(viewingAngle.y) * 0.5;
+		//target.yo = target.y + centerY * screenParams.height * env.availableHeight / 4; //Aproximation
+		//var centerX = Math.sin(viewingAngle.x) * 0.5;
+		//target.yo = centerX * screenParams.width * env.availableWidth / 4; //Aproximation
 
-		// Correct camera target based on viewing angle
+		// Correct camera target based on viewing angle - Real deal
 		var y0 = frame.position.y + frame.scale.y * screenParams.height/2;
 		var yf = frame.position.y - frame.scale.y * screenParams.height/2;
 
@@ -195,10 +211,6 @@
 
     	camera.lookAt(target);
 		camera.updateProjectionMatrix();
-
-		//Doesn't work
-		//camera.projectionMatrix.elements[3] = -viewingAngle.x;
-		//camera.projectionMatrix.elements[7] = viewingAngle.y;
     }
 
     function render() {
@@ -206,7 +218,7 @@
 
 		//controls.update();
 		//light.position = camera.position;
-
+		//composer.render(0.1);
         renderer.render( scene, camera );
     }
 
