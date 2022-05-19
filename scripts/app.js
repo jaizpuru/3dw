@@ -11,7 +11,7 @@
 
 	function connectToKinect() {
 		var kinectService = new Alchemy({ 
-		    Server: 'localhost',
+		    Server: '127.0.0.1',
 		    Port: 9001,
 		    DebugMode: false
 		});
@@ -91,7 +91,7 @@
     	camera.lookAt(new THREE.Vector3(x, y, z).add(camera.position));
 		//camera.scale.x = viewingScaleH;
 
-		var relativeScreenWidth = viewingScaleH * screenWidth;
+		//var relativeScreenWidth = viewingScaleH * screenWidth;
 		// Vertical
 		//var angleV = Math.atan(y/z);
 
