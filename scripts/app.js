@@ -1,53 +1,114 @@
     var scene, camera, renderer, light;
-    var stadium, ground;
+    var park, chair, ground, frame;
 
-    var screenHeight = 0.273, //mts
-    	initial = {x: -100, y: 60, f: 10};
+    // Full HD monitor
+    /*
+    var screenParams = {
+    	diag: 21.5 * 0.0254, //mts
+    	altitude: 1.15, //mts
+    	sensorAltitude: 1.1 //mts
+    };
+	*/
+
+    // Full HD TV
+    var screenParams = {
+    	diag: 40 * 0.0254, //mts
+    	altitude: 1.15, //mts
+    	sensorAltitude: 1.1, //mts
+    	sensorOffsetZ: -0.05 //mts
+    };
+
+   	screenParams.aspectRatio = screen.width / screen.height;
+    screenParams.diagAngle = Math.atan(1/screenParams.aspectRatio);
+    screenParams.height = Math.sin(screenParams.diagAngle) * screenParams.diag; //mts
+    screenParams.width = Math.cos(screenParams.diagAngle) * screenParams.diag; //mts
 
 	function load(callback) {
 		var loader = new THREE.OBJMTLLoader();
-		loader.load( 'models/Petco Park.obj', 'models/Petco Park.mtl', callback);
+		loader.load( 'models/Petco Park.obj', 'models/Petco Park.mtl', function(_park) {
+			loader.load('models/Chair.obj', 'models/Chair.mtl', function(_chair) {
+				park = _park;
+				chair = _chair;
+				callback();
+			});
+		});
 	}
 
 	function connectToKinect() {
 		var kinectService = new Alchemy({ 
 		    Server: '127.0.0.1',
 		    Port: 9001,
-		    DebugMode: false
+		    DebugMode: true
 		});
 
 		kinectService.Connected = function(){
-		    console.log("Connected!");
 		    window.onmousemove = null;
 		};
 
 		kinectService.Disconnected = function() {
-		    //throw "Server Down";
-		    console.log('Disconnected');
 		};
 
 		kinectService.MessageReceived = function(event) {
 			//console.log(event.data);
-			var coords = event.data.split('|');
-			doMove(parseFloat(coords[0]), parseFloat(coords[1]), parseFloat(coords[2]));
+			var rCoords = event.data.split('|');
+			var coords = {x: parseFloat(rCoords[0]), y: parseFloat(rCoords[1]), z: parseFloat(rCoords[2])};
+			coords.y += screenParams.sensorAltitude;
+			coords.z += screenParams.sensorOffsetZ;
+
+			doMove(coords.x, coords.y, coords.z);
 		};
 
 		kinectService.Start();
 	}
 
+	function onWindowResize() {
+		camera.aspect = window.innerWidth / window.innerHeight;
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		camera.updateProjectionMatrix();
+		env = {
+			
+	    	availableHeight: window.innerHeight/screen.height,
+	    	availableWidth: window.innerWidth/screen.width
+	    };
+	    frame.scale.x = env.availableWidth;
+	    frame.scale.y = env.availableHeight;
+	    for(var i = 0; i < 4; i++) {
+	    	frame.children[i].scale.x = 1 / env.availableWidth;
+	    	frame.children[i].scale.y = 1 / env.availableHeight;
+	    }
+	}
 
-    function init(model) {
-
+    function init() {
         scene = new THREE.Scene();
 
-		stadium = model;
-		stadium.scale.x = stadium.scale.y = stadium.scale.z = 0.1;
-        scene.add(stadium);
+        // Frame
+        var mat = new THREE.MeshBasicMaterial({/*transparent: true, opacity: 0.6, */color: 0xff0000});
+        var geo = new THREE.SphereGeometry(0.01, 8, 8);
+        frame = new THREE.Object3D();
 
-        camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 20, 2000 );
+        for (var i = 0; i < 4; i++) {
+        	var y = (i < 2) ? screenParams.height/2 : -screenParams.height/2;
+        	var x = (i % 2 == 0) ? -screenParams.width/2 : screenParams.width/2;
+	        var frameVertex = new THREE.Mesh(geo, mat);
+	        frameVertex.position.set(x, y, 0);
+	        frame.add(frameVertex);
+        }
+        frame.position.set(0, screenParams.altitude + screenParams.height / 2, 0);
+        scene.add(frame);
 
-        camera.position.set(initial.x, initial.y, -1220);
-		camera.lookAt(new THREE.Vector3(stadium.position.x, initial.y, stadium.position.z));
+        // Model
+		park.scale.x = park.scale.y = park.scale.z = 0.1;
+		park.position.set(0, -60, 1220);
+
+        //scene.add(park);
+
+        chair.scale.x = chair.scale.y = chair.scale.z = 0.1;
+        chair.position.set(0, 0, 60);
+        scene.add(chair);
+        
+        camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 2000 );
+        camera.position.set(0, screenParams.altitude + screenParams.height/2, -2);
+		camera.lookAt(frame.position);
 
 		// LIGHTS
 		var dirLight = new THREE.PointLight( 0xff0000, 1, 500 );
@@ -56,7 +117,7 @@
 		scene.add(new THREE.AmbientLight( 0x666666));
 
 	    light = new THREE.DirectionalLight(0xffffff, 1);
-		light.target = stadium;
+		light.target = park;
 		light.shadowCameraNear = 100;
 	    light.shadowCameraFar = 1200;
         scene.add(light);
@@ -66,9 +127,10 @@
 		scene.add(ground);
 
         renderer = new THREE.WebGLRenderer({antialias: true});
-        renderer.setSize( window.innerWidth, window.innerHeight );
-
         document.body.appendChild(renderer.domElement);
+
+        onWindowResize();
+        window.addEventListener('resize', onWindowResize, false );
 
         // Init handlers
 		window.onmousemove = moveMouse;
@@ -77,37 +139,50 @@
     }
 
     function moveMouse(e) {
-    	var x = (0.5 - e.screenX / window.innerWidth) * 3;
-    	var y = 0;//initial.y;//(0.5 - e.screenY / window.innerHeight) * 2;
-    	var z = 0.1 + e.screenY / window.innerHeight;
+    	var x = (0.5 - e.pageX / window.innerWidth) * screenParams.width * 2;
+    	var y = frame.position.y + (0.5 - e.pageY / window.innerHeight) * screenParams.height;
+    	var z = 0.5;//0.1 + (e.pageY / window.innerHeight) * 1.8;/*0.2mts - 2mts*/;
     	doMove(x, y, z);
     }
 
     function doMove(x, y, z) {
-		var viewingAngleH = Math.atan(x/z);
-		var viewingScaleH = Math.cos(viewingAngleH);
+    	$('.stats')
+    		.find('.x').text(x).end()
+    		.find('.y').text(y).end()
+    		.find('.z').text(z).end();
 
-    	// Horizontal
-    	camera.lookAt(new THREE.Vector3(x, y, z).add(camera.position));
-		//camera.scale.x = viewingScaleH;
+    	camera.position.set(-x, y, -z);
+    	camera.lookAt(frame.position);
 
-		//var relativeScreenWidth = viewingScaleH * screenWidth;
-		// Vertical
-		//var angleV = Math.atan(y/z);
+    	var distanceVector = camera.position.clone().sub(frame.position);
 
-		// Depth
-		var distance = new THREE.Vector3(x,y,z).length();
-		var fov = Math.atan(screenHeight / 2 / distance) * 2;
-		camera.fov = fov / Math.PI * 180;
+
+    	var zScale = Math.atan(screenParams.height * env.availableHeight / 2 / distanceVector.length()) * 2;
+    	camera.fov = zScale / Math.PI * 180;
+
+    	// Correct viewing angle
+		//var vaH = Math.atan(x/z);
+		//camera.scale.x = Math.cos(vaH);
+
+		var viewingAngle = {
+			x: Math.atan(distanceVector.x / z),
+			y: Math.atan(distanceVector.y / z)
+		};
+
+		//camera.scale.x = Math.cos(viewingAngle.x);
+		camera.scale.y = Math.cos(viewingAngle.y);
 
 		camera.updateProjectionMatrix();
+
+		//camera.projectionMatrix.elements[3] = -viewingAngle.x;
+		camera.projectionMatrix.elements[7] = viewingAngle.y;
     }
 
     function render() {
         requestAnimationFrame(render);
 
 		//controls.update();
-		light.position = camera.position;
+		//light.position = camera.position;
 
         renderer.render( scene, camera );
     }
