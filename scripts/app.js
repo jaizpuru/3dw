@@ -63,6 +63,7 @@
 
 	function onWindowResize() {
 		camera.aspect = window.innerWidth / window.innerHeight;
+
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		camera.updateProjectionMatrix();
 		env = {
@@ -136,13 +137,13 @@
 
 		//POST PROCESSING
 		//Create Shader Passes
-		renderPass = new THREE.RenderPass( scene, camera );
+		//renderPass = new THREE.RenderPass( scene, camera );
 
-		composer = new THREE.EffectComposer( renderer);
-		composer.addPass(renderPass);
-		var mirror = new THREE.ShaderPass(THREE.MirrorShader);
-		composer.addPass(mirror);
-		mirror.renderToScreen = true;
+		//composer = new THREE.EffectComposer( renderer);
+		//composer.addPass(renderPass);
+		//var mirror = new THREE.ShaderPass(THREE.MirrorShader);
+		//composer.addPass(mirror);
+		//mirror.renderToScreen = true;
 
         onWindowResize();
         window.addEventListener('resize', onWindowResize, false );
@@ -168,26 +169,13 @@
 
     	camera.position.set(-x, y, -z);
 
-    	var distanceVector = camera.position.clone().sub(frame.position);
+		var target = frame.position.clone();
+
+    	var distanceVector = camera.position.clone().sub(target);
 
     	var zScale = Math.atan(screenParams.height * env.availableHeight / 2 / distanceVector.length()) * 2;
     	camera.fov = zScale / Math.PI * 180;
-
-		var viewingAngle = {
-			x: Math.atan(distanceVector.x / z),
-			y: Math.atan(distanceVector.y / z)
-		};
-
-		camera.scale.x = Math.cos(viewingAngle.x) * 3;
-		camera.scale.y = Math.cos(viewingAngle.y) * 3;
-
-		var target = frame.position.clone();
-		
-		// Correct camera target based on viewing angle - Fast approximation ~ 60% efficiency
-		//var centerY = Math.sin(viewingAngle.y) * 0.5;
-		//target.yo = target.y + centerY * screenParams.height * env.availableHeight / 4; //Aproximation
-		//var centerX = Math.sin(viewingAngle.x) * 0.5;
-		//target.yo = centerX * screenParams.width * env.availableWidth / 4; //Aproximation
+		//camera.updateProjectionMatrix();
 
 		// Correct camera target based on viewing angle - Real deal
 		var y0 = frame.position.y + frame.scale.y * screenParams.height/2;
@@ -210,7 +198,31 @@
 		target.x = Math.tan(xam) * z - x;
 
     	camera.lookAt(target);
-		camera.updateProjectionMatrix();
+
+    	// Project frame vertices onto the screen so as to correctly determine the portion of the rendered picture that should make it to the final picture.
+    	var projCamera = camera.clone();
+    	projCamera.scale.x = projCamera.scale.y = 1;
+
+    	projCamera.updateMatrixWorld();
+
+		var projector = new THREE.Projector();
+		var vector = new THREE.Vector3();
+
+		var x0 = 0, x1 = 0, y0 = 0, y1 = 0;
+		var dot;
+		var inverseMatrix = new THREE.Matrix4().getInverse(projCamera.matrixWorld);
+		var projectorMatrix = new THREE.Matrix4().multiplyMatrices( projCamera.projectionMatrix, inverseMatrix );
+
+		for (var i = 0; i < 4; i++) {
+			dot = vector.setFromMatrixPosition( frame.children[i].matrixWorld ).applyProjection( projectorMatrix );
+			x0 = Math.min(x0, dot.x);
+			y0 = Math.min(y0, dot.y);
+			x1 = Math.max(x1, dot.x);
+			y1 = Math.max(y1, dot.y);
+		}
+
+		camera.scale.x = Math.max(x1, -x0);
+		camera.scale.y = Math.max(y1, -y0);
     }
 
     function render() {
