@@ -8,15 +8,13 @@
 		H: <span class="x"></span><br />
 		V: <span class="y"></span><br />
 		D: <span class="z"></span><br />
+		F: <span class="f"></span><br />
 	</div>
 
 
 	<script src="scripts/jquery-2.1.0.min.js"></script>
 	<script src="scripts/three-67.min.js"></script>
-	<script src="scripts/EffectComposer.js"></script>
-	<script src="scripts/RenderPass.js"></script>
-	<script src="scripts/ShaderPass.js"></script>
-	<script src="scripts/MaskPass.js"></script>
+	<script src="scripts/PostProcessor.js"></script>
 
 	<script src="scripts/OBJMTLLoader.js"></script>
 	<script src="scripts/MTLLoader.js"></script>
@@ -26,56 +24,33 @@
 	<script src="scripts/app.js"></script>
 	<script src="scripts/alchemy-client.js"></script>
 
-	<script>
-		THREE.MirrorShader = {
+	<script id="vertexShader" type="x-shader/x-vertex">
+		varying vec2 vUv;
 
-			uniforms: {
+		void main() {
+			vUv = uv;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+		}
+	</script>
+	<script id="fragmentShader" type="x-shader/x-fragment">
+		uniform sampler2D tDiffuse;
+		uniform vec2 tr;
+		uniform vec2 tl;
+		uniform vec2 br;
+		uniform vec2 bl;
 
-				"tDiffuse": { type: "t", value: null },
-				"side":     { type: "i", value: 2 }
+		varying vec2 vUv;
 
-			},
+		void main() {
 
-			vertexShader: [
+			vec2 p = vUv;
+			vec2 po = vUv;
+			po.x = (p.x * tr.x + (1.0 - p.x) * tl.x) * p.y + (p.x * br.x + (1.0 - p.x) * bl.x) * (1.0 - p.y);
+			po.y = (p.x * tr.y + (1.0 - p.x) * tl.y) * p.y + (p.x * br.y + (1.0 - p.x) * bl.y) * (1.0 - p.y);
 
-				"varying vec2 vUv;",
-
-				"void main() {",
-
-					"vUv = uv;",
-					"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-
-				"}"
-
-			].join("\n"),
-
-			fragmentShader: [
-
-				"uniform sampler2D tDiffuse;",
-				"uniform int side;",
-				
-				"varying vec2 vUv;",
-
-				"void main() {",
-
-					"vec2 p = vUv;",
-					"if (side == 0){",
-						"if (p.x > 0.5) p.x = 1.0 - p.x;",
-					"}else if (side == 1){",
-						"if (p.x < 0.5) p.x = 1.0 - p.x;",
-					"}else if (side == 2){",
-						"if (p.y < 0.5) p.y = 1.0 - p.y;",
-					"}else if (side == 3){",
-						"if (p.y > 0.5) p.y = 1.0 - p.y;",
-					"} ",
-					"vec4 color = texture2D(tDiffuse, p);",
-					"gl_FragColor = color;",
-
-				"}"
-
-			].join("\n")
-
-		};
+			vec4 color = texture2D(tDiffuse, po);
+			gl_FragColor = color;
+		}
 	</script>
 	
 </body>
