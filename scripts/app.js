@@ -68,7 +68,9 @@
 		camera.updateProjectionMatrix();
 		env = {
 	    	availableHeight: window.innerHeight/screen.height,
-	    	availableWidth: window.innerWidth/screen.width
+	    	availableWidth: window.innerWidth/screen.width,
+	    	frameHalfWidth: screenParams.width/2 * window.innerWidth/screen.width,
+	    	frameHalfHeight: screenParams.height/2 * window.innerHeight/screen.height
 	    };
 	    frame.scale.x = env.availableWidth;
 	    frame.scale.y = env.availableHeight;
@@ -87,8 +89,8 @@
         frame = new THREE.Object3D();
 
         for (var i = 0; i < 4; i++) {
-        	var y = (i < 2) ? screenParams.height/2 : -screenParams.height/2;
-        	var x = (i % 2 == 0) ? -screenParams.width/2 : screenParams.width/2;
+        	var y = screenParams.height/2 * (i < 2 ? 1 : -1);
+        	var x = screenParams.width/2 * ((i % 2 > 0) ?  1 : -1);
 	        var frameVertex = new THREE.Mesh(geo, mat);
 	        frameVertex.position.set(x, y, 0);
 	        frame.add(frameVertex);
@@ -160,6 +162,8 @@
     	doMove(x, y, z);
     }
 
+	var projectionMatrix = new THREE.Matrix4();
+	var unity = new THREE.Vector3(1,1,1);
     function doMove(x, y, z) {
     	$('.stats')
     		.find('.x').text(x).end()
@@ -170,50 +174,39 @@
 
 		var target = frame.position.clone();
 
-    	var distanceVector = camera.position.clone().sub(target);
 
-    	var zScale = Math.atan(screenParams.height * env.availableHeight / 2 / distanceVector.length()) * 2;
-    	camera.fov = zScale / Math.PI * 180;
-		camera.updateProjectionMatrix();
-
-		// Correct camera target based on viewing angle - Real deal
-		var y0 = frame.position.y + frame.scale.y * screenParams.height/2;
-		var yf = frame.position.y - frame.scale.y * screenParams.height/2;
-
-		var ya1 = Math.atan((y - y0) / z);
-		var ya2 = Math.atan((y - yf) / z);
+		// Adjust camera target based on viewing angle - Where's the frame center if you take the perspective into account?
+		var ya1 = Math.atan((y - frame.position.y - env.frameHalfHeight) / z);
+		var ya2 = Math.atan((y - frame.position.y + env.frameHalfHeight) / z);
 		var yam = (ya2 + ya1)/2;
-
 		target.y = y - Math.tan(yam) * z;
 
-		//Target X
-		var x0 = frame.scale.x * screenParams.width/2;
-		var xf = -frame.scale.x * screenParams.width/2;
-
-		var xa1 = Math.atan((x - x0) / z);
-		var xa2 = Math.atan((x - xf) / z);
-		var xam = (xa2 + xa1)/2;
-
+		var xa1 = Math.atan((x - env.frameHalfWidth) / z);
+		var xa2 = Math.atan((x + env.frameHalfWidth) / z);
+		var xam = (xa2 + xa1) / 2;
 		target.x = Math.tan(xam) * z - x;
 
     	camera.lookAt(target);
 
+
+		// What's the correct viewing angle?
+    	var distanceVector = camera.position.clone().sub(target);
+    	var zScale = Math.atan(screenParams.height * env.availableHeight / 2 / distanceVector.length()) * 2;
+    	camera.fov = zScale / Math.PI * 180;
+		camera.updateProjectionMatrix();
+
+
     	// Project frame vertices onto the screen so as to correctly determine the portion of the rendered picture that should make it to the final picture.
-    	var projCamera = camera.clone();
-    	projCamera.scale.x = projCamera.scale.y = 1;
-
-    	projCamera.updateMatrixWorld();
-
-		var projector = new THREE.Projector();
+    	// Matrix operation where extracted from THREE.Projector, camera.updateWorldMatrix();
+    	projectionMatrix.compose(camera.position, camera.quaternion, unity);
 		var vector = new THREE.Vector3();
 
 		var x0 = 0, x1 = 0, y0 = 0, y1 = 0;
 		var dot;
-		var inverseMatrix = new THREE.Matrix4().getInverse(projCamera.matrixWorld);
-		var projectorMatrix = new THREE.Matrix4().multiplyMatrices( projCamera.projectionMatrix, inverseMatrix );
+		projectionMatrix = new THREE.Matrix4().multiplyMatrices( camera.projectionMatrix, new THREE.Matrix4().getInverse(projectionMatrix) );
 
 		for (var i = 0; i < 4; i++) {
-			dot = vector.setFromMatrixPosition( frame.children[i].matrixWorld ).applyProjection( projectorMatrix );
+			dot = vector.setFromMatrixPosition( frame.children[i].matrixWorld ).applyProjection( projectionMatrix );
 			x0 = Math.min(x0, dot.x);
 			y0 = Math.min(y0, dot.y);
 			x1 = Math.max(x1, dot.x);
