@@ -1,10 +1,8 @@
     var scene, camera, renderer, light;
     var stadium, ground;
 
-    var screenWidth = 0.473, //mts
-    	initial = {x: -100, y: 60, f: 10},
-    	initialRotation;
-
+    var screenHeight = 0.273, //mts
+    	initial = {x: -100, y: 60, f: 10};
 
 	function load(callback) {
 		var loader = new THREE.OBJMTLLoader();
@@ -19,7 +17,8 @@
 		});
 
 		kinectService.Connected = function(){
-		    console.log("connected");
+		    console.log("Connected!");
+		    window.onmousemove = null;
 		};
 
 		kinectService.Disconnected = function() {
@@ -49,21 +48,6 @@
 
         camera.position.set(initial.x, initial.y, -1220);
 		camera.lookAt(new THREE.Vector3(stadium.position.x, initial.y, stadium.position.z));
-		camera.rotation.y = 0;
-
-		initialRotation = {x: camera.rotation.x, y: camera.rotation.y, z: camera.rotation.z};
-
-		/*
-		controls = new THREE.TrackballControls( camera );
-		controls.target = stadium.position;
-		controls.rotateSpeed = 1.0;
-		controls.zoomSpeed = 1.2;
-		controls.panSpeed = 0.8;
-		controls.noZoom = false;
-		controls.noPan = false;
-		controls.staticMoving = true;
-		controls.dynamicDampingFactor = 0.3;
-		*/
 
 		// LIGHTS
 		var dirLight = new THREE.PointLight( 0xff0000, 1, 500 );
@@ -94,8 +78,8 @@
 
     function moveMouse(e) {
     	var x = (0.5 - e.screenX / window.innerWidth) * 3;
-    	var y = (0.5 - e.screenY / window.innerHeight) * 2;
-    	var z = 0.3 + e.screenY / window.innerHeight * 3;
+    	var y = 0;//initial.y;//(0.5 - e.screenY / window.innerHeight) * 2;
+    	var z = 0.1 + e.screenY / window.innerHeight;
     	doMove(x, y, z);
     }
 
@@ -104,18 +88,17 @@
 		var viewingScaleH = Math.cos(viewingAngleH);
 
     	// Horizontal
-		camera.rotation.y = initialRotation.y - viewingAngleH;
-		camera.scale.x = viewingScaleH;
+    	camera.lookAt(new THREE.Vector3(x, y, z).add(camera.position));
+		//camera.scale.x = viewingScaleH;
 
 		var relativeScreenWidth = viewingScaleH * screenWidth;
 		// Vertical
 		//var angleV = Math.atan(y/z);
-		//camera.rotation.x = initialRotation.x + angleV;
 
 		// Depth
 		var distance = new THREE.Vector3(x,y,z).length();
-		var fov = Math.atan(screenWidth / 2 / distance) * 2;
-//		camera.fov = fov / Math.PI * 180;
+		var fov = Math.atan(screenHeight / 2 / distance) * 2;
+		camera.fov = fov / Math.PI * 180;
 
 		camera.updateProjectionMatrix();
     }
