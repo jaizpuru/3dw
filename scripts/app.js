@@ -66,7 +66,6 @@
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		camera.updateProjectionMatrix();
 		env = {
-			
 	    	availableHeight: window.innerHeight/screen.height,
 	    	availableWidth: window.innerWidth/screen.width
 	    };
@@ -139,8 +138,8 @@
     }
 
     function moveMouse(e) {
-    	var x = (0.5 - e.pageX / window.innerWidth) * screenParams.width * 2;
-    	var y = frame.position.y + (0.5 - e.pageY / window.innerHeight) * screenParams.height;
+    	var x = 0;//(0.5 - e.pageX / window.innerWidth) * screenParams.width * 4;
+    	var y = frame.position.y + (0.5 - e.pageY / window.innerHeight) * screenParams.height * 12;
     	var z = 0.5;//0.1 + (e.pageY / window.innerHeight) * 1.8;/*0.2mts - 2mts*/;
     	doMove(x, y, z);
     }
@@ -152,30 +151,54 @@
     		.find('.z').text(z).end();
 
     	camera.position.set(-x, y, -z);
-    	camera.lookAt(frame.position);
 
     	var distanceVector = camera.position.clone().sub(frame.position);
 
-
     	var zScale = Math.atan(screenParams.height * env.availableHeight / 2 / distanceVector.length()) * 2;
     	camera.fov = zScale / Math.PI * 180;
-
-    	// Correct viewing angle
-		//var vaH = Math.atan(x/z);
-		//camera.scale.x = Math.cos(vaH);
 
 		var viewingAngle = {
 			x: Math.atan(distanceVector.x / z),
 			y: Math.atan(distanceVector.y / z)
 		};
 
-		//camera.scale.x = Math.cos(viewingAngle.x);
-		camera.scale.y = Math.cos(viewingAngle.y);
+		camera.scale.x = Math.cos(viewingAngle.x) * 5;
+		camera.scale.y = Math.cos(viewingAngle.y) * 5;
 
+		var target = frame.position.clone();
+		
+		// Correct camera target based on viewing angle - Fast approximation ~ 60% efficiency
+		var centerY = Math.sin(viewingAngle.y) * 0.5;
+		target.yo = target.y + centerY * screenParams.height * env.availableHeight / 4; //Aproximation
+		var centerX = Math.sin(viewingAngle.x) * 0.5;
+		target.yo = centerX * screenParams.width * env.availableWidth / 4; //Aproximation
+
+		// Correct camera target based on viewing angle
+		var y0 = frame.position.y + frame.scale.y * screenParams.height/2;
+		var yf = frame.position.y - frame.scale.y * screenParams.height/2;
+
+		var ya1 = Math.atan((y - y0) / z);
+		var ya2 = Math.atan((y - yf) / z);
+		var yam = (ya2 + ya1)/2;
+
+		target.y = y - Math.tan(yam) * z;
+
+		//Target X
+		var x0 = frame.scale.x * screenParams.width/2;
+		var xf = -frame.scale.x * screenParams.width/2;
+
+		var xa1 = Math.atan((x - x0) / z);
+		var xa2 = Math.atan((x - xf) / z);
+		var xam = (xa2 + xa1)/2;
+
+		target.x = Math.tan(xam) * z - x;
+
+    	camera.lookAt(target);
 		camera.updateProjectionMatrix();
 
+		//Doesn't work
 		//camera.projectionMatrix.elements[3] = -viewingAngle.x;
-		camera.projectionMatrix.elements[7] = viewingAngle.y;
+		//camera.projectionMatrix.elements[7] = viewingAngle.y;
     }
 
     function render() {
